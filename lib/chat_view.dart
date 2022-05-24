@@ -6,7 +6,8 @@ class ChatView extends StatefulWidget {
   const ChatView({Key? key, this.title, required this.messages})
       : super(key: key);
   final String? title;
-  final List messages;
+  final List<Message> messages;
+
   @override
   ChatViewState createState() => ChatViewState();
 }
@@ -14,6 +15,7 @@ class ChatView extends StatefulWidget {
 class ChatViewState extends State<ChatView> {
   List<Widget> messagesBox = [];
   final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {

@@ -3,19 +3,63 @@ import 'package:kuzzle/kuzzle.dart';
 import 'chat_view.dart';
 import 'message.dart';
 
-class Chat extends StatefulWidget {
-  Chat({Key? key, String? this.username}) : super(key: key);
-  String? username = "";
-  String title = "";
+class Chat extends StatelessWidget {
+  final String username;
+
+  const Chat(this.username);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Chat app',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: ChatPage(title: 'Chat app', username: username),
+    );
+  }
+}
+
+class ChatPage extends StatefulWidget {
+  const ChatPage({Key? key, required this.title, required this.username})
+      : super(key: key);
+
+  final String title;
+  final String username;
+
   @override
   _ChatPage createState() => _ChatPage();
 }
 
-class _ChatPage extends State<Chat> {
+class _ChatPage extends State<ChatPage> {
   late Kuzzle _kuzzle;
-  var _roomId;
-  List _messages = [];
+  List<Message> _messages = [];
+  late String _roomId;
   final _chatController = TextEditingController();
+
+  @override
+  void dispose() {
+    _chatController.dispose();
+    _kuzzle.realtime.unsubscribe(_roomId);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _kuzzle = Kuzzle(WebSocketProtocol(Uri(
+      scheme: 'ws',
+      host: 'localhost',
+      port: 7512,
+    )));
+    // Etablish the connection
+    _kuzzle.connect().then((_) {
+      _initData();
+      _fetchMessages();
+      _subscribeToNewMessages();
+    });
+    super.initState();
+  }
 
   void _initData() async {
     // Check if 'chat' index exists
@@ -59,22 +103,6 @@ class _ChatPage extends State<Chat> {
         _messages.add(Message.fromJson(notification.result));
       });
     }, subscribeToSelf: true);
-  }
-
-  @override
-  void initState() {
-    _kuzzle = Kuzzle(WebSocketProtocol(Uri(
-      scheme: 'ws',
-      host: 'localhost',
-      port: 7512,
-    )));
-    // Etablish the connection
-    _kuzzle.connect().then((_) {
-      _initData();
-      _fetchMessages();
-      _subscribeToNewMessages();
-    });
-    super.initState();
   }
 
   @override

@@ -17,13 +17,16 @@ class Login extends StatelessWidget {
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key, required this.title}) : super(key: key);
+
   final String title;
+
   @override
   _LoginPage createState() => _LoginPage();
 }
 
 class _LoginPage extends State<LoginPage> {
   final _loginController = TextEditingController();
+
   @override
   void dispose() {
     _loginController.dispose();
@@ -49,7 +52,7 @@ class _LoginPage extends State<LoginPage> {
                         padding: const EdgeInsets.only(left: 8),
                         child: TextField(
                           controller: _loginController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Username',
                           ),
                         ),
@@ -60,10 +63,10 @@ class _LoginPage extends State<LoginPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Chat(username: _loginController.text)),
+                                    Chat(_loginController.text)),
                           );
                         },
-                        child: Text('Next'),
+                        child: const Text('Next'),
                       ),
                     ],
                   ),
